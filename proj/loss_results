@@ -1,0 +1,38 @@
+Choose operating mode:
+[G] Generate, [D] Default solve (10000), [#] Solve with # iterations
+Running simulated annealing solver...
+
+inputs/input4: 302.3681294435923
+inputs/input5: 111.83584148395975
+inputs/input2: 111.83584148395975
+inputs/input3: 111.83584148395975
+inputs/input9: 111.83584148395975
+inputs/input8: 201.83584148395977
+inputs/input19: 111.83584148395975
+inputs/input18: 111.83584148395975
+inputs/input17: 136.83584148395977
+inputs/input13: 111.83584148395975
+inputs/medium.in: 96.77422742688567
+inputs/small.in: 1819.077421415239
+inputs/input1: 302.3681294435923
+inputs/input12: 111.83584148395975
+inputs/input7: 111.83584148395975
+inputs/input6: 111.83584148395975
+inputs/input16: 111.83584148395975
+inputs/input15: 111.83584148395975
+inputs/input11: 111.83584148395975
+inputs/input20: 302.2871446754048
+inputs/input0: 111.83584148395975
+inputs/input26: 819.9722504971635
+inputs/input23: 302.2871446754048
+inputs/input29: 2227.197386538649
+inputs/input27: 2227.2044826654906
+inputs/input10: 111.83584148395975
+inputs/input24: 2352.209709294489
+inputs/large.in: 143.9572072933631
+inputs/input14: 111.83584148395975
+inputs/input21: 819.9722504971635
+inputs/input25: 2227.197386538649
+inputs/input22: 3911.2044826654906
+inputs/input28: 2227.197386538649
+Running simulated annealing solver complete!

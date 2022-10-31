@@ -33,5 +33,5 @@ pub fn write_output(filepath: &str, g: &Graph, p: &Partition) {
             .enumerate()
             .map(|(i, part)| format!("{i} {part}"))
             .join("\n");
-    fs::write(filepath, contents);
+    let _ = fs::write(filepath, contents);
 }

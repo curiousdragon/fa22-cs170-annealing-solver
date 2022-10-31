@@ -1,19 +1,14 @@
-use std::vec;
-
 use crate::datatypes::Graph;
 use crate::datatypes::Partition;
 use crate::scorer::loss;
+use itertools::Itertools;
 use rand::distributions::{Distribution, Uniform};
 use rand::Rng;
 
 pub fn init(g: &Graph, num_partitions: i32) -> Partition {
-    let mut partitions = vec![0; g.n as usize];
-    for i in 0..(g.n as usize) {
-        partitions[i] = (i as i32) % num_partitions;
-    }
     Partition {
         k: num_partitions,
-        partitions,
+        partitions: (0..g.n).map(|i| i % num_partitions).collect_vec(),
     }
 }
 
@@ -98,7 +93,7 @@ pub fn run(g: &Graph, iterations: usize, rng: &mut impl Rng) -> Partition {
     // }
     // simulated_annealing(g, iterations, rng, left)
     let low = 1;
-    let high = 10;
+    let high = 20;
     let mut best_partition = init(g, 1);
     let mut best_cost = f64::MAX;
     for k in low..high {
