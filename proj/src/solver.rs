@@ -1,17 +1,19 @@
+use std::vec;
+
 use crate::datatypes::Graph;
 use crate::datatypes::Partition;
 use crate::scorer::loss;
 use rand::distributions::{Distribution, Uniform};
 use rand::Rng;
 
-pub fn init(g: &Graph) -> Partition {
-    // let mut rng = thread_rng();
-    // let between = Uniform::from(0..g.n);
-    // let partitions: HashMap<i32, i32> = (0..g.n).map(|i| (i, between.sample(&mut rng))).collect();
-    // let k = partitions.values().iter().max();
+pub fn init(g: &Graph, num_partitions: i32) -> Partition {
+    let mut partitions = vec![0; g.n as usize];
+    for i in 0..(g.n as usize) {
+        partitions[i] = (i as i32) % num_partitions;
+    }
     Partition {
-        k: 1,
-        partitions: vec![0; g.n as usize],
+        k: num_partitions,
+        partitions,
     }
 }
 
@@ -27,12 +29,8 @@ fn propose(g: &Graph, prev_p: &Partition, rng: &mut impl Rng) -> Partition {
         proposed_p.partitions[j] = prev_p.partitions[i];
     } else {
         let i = nodes.sample(rng);
-        let parts = Uniform::from(0..=prev_p.k);
-        let i_partition = parts.sample(rng);
-        proposed_p.partitions.insert(i, i_partition);
-        if i_partition == prev_p.k {
-            proposed_p.k += 1;
-        }
+        let parts = Uniform::from(0..prev_p.k);
+        proposed_p.partitions[i] = parts.sample(rng);
     }
 
     proposed_p
@@ -42,9 +40,10 @@ fn temperature(r: &f64) -> f64 {
     // let lambda = 0.5_f64;
     // f64::exp(-r / lambda)
 
-    // let beta = 0.5;
-    // r / (1_f64 + beta * r)
-    *r
+    let beta = 0.5;
+    r / (1_f64 + beta * r)
+
+    // *r
 }
 
 fn acceptance(g: &Graph, prev_p: &Partition, proposed_p: &Partition, temp: &f64) -> f64 {
@@ -57,9 +56,13 @@ fn acceptance(g: &Graph, prev_p: &Partition, proposed_p: &Partition, temp: &f64)
     }
 }
 
-pub fn simulated_annealing(g: &Graph, iterations: usize, rng: &mut impl Rng) -> Partition {
-    let mut prev_p = init(g);
-    // let mut temp = 1_f64;
+pub fn simulated_annealing(
+    g: &Graph,
+    iterations: usize,
+    rng: &mut impl Rng,
+    num_partitions: i32,
+) -> Partition {
+    let mut prev_p = init(g, num_partitions);
     for i in 0..iterations {
         let temp = temperature(&(1_f64 - ((i as f64) / (iterations as f64))));
         let proposed_p = propose(g, &prev_p, rng);
@@ -68,10 +71,43 @@ pub fn simulated_annealing(g: &Graph, iterations: usize, rng: &mut impl Rng) -> 
         if prob <= accept_prob {
             prev_p = proposed_p;
         }
-        // temp = temp - temperature(&temp);
-        if i % 1000 == 0 {
-            println!("{} {}", loss(g, &prev_p), accept_prob);
+        // if i % 1000 == 0 {
+        //     println!("{}", loss(g, &prev_p));
+        // }
+    }
+    // println!("{}", loss(g, &prev_p));
+    prev_p
+}
+
+pub fn run(g: &Graph, iterations: usize, rng: &mut impl Rng) -> Partition {
+    // // let mut left = 0;
+    // let mut left = 2;
+    // // let mut right = g.n;
+    // let mut right = 10;
+    // while (right - left).abs() > 2 {
+    //     let left_third = left + (right - left) / 3;
+    //     let right_third = right - (right - left) / 3;
+
+    //     let left_partition = simulated_annealing(g, iterations, rng, left_third);
+    //     let right_partition = simulated_annealing(g, iterations, rng, right_third);
+    //     if loss(g, &left_partition) < loss(g, &right_partition) {
+    //         left = left_third;
+    //     } else {
+    //         right = right_third;
+    //     }
+    // }
+    // simulated_annealing(g, iterations, rng, left)
+    let low = 2;
+    let high = 10;
+    let mut best_partition = init(g, 1);
+    let mut best_cost = f64::MAX;
+    for k in low..high {
+        let p = simulated_annealing(g, iterations, rng, k);
+        let cost = loss(g, &p);
+        if cost < best_cost {
+            best_cost = cost;
+            best_partition = p;
         }
     }
-    prev_p
+    best_partition
 }

@@ -36,10 +36,25 @@ def networkx_graph_from_input(path: str):
             G.edges[int(i), int(j)]['weight'] = int(w)
         return G
 
+def networkx_graph_from_output(path: str):
+    with open(path) as f:
+        lines = list(f)
+        n = int(lines[0])
+        e = int(lines[1])
+        G = nx.Graph()
+        G.add_nodes_from(range(n))
+        for line in lines[2:2+e]:
+            i, j, w = line.split()
+            G.add_edge(int(i), int(j))
+            G.edges[int(i), int(j)]['weight'] = int(w)
+        for line in lines[2+e:]:
+            i, team = line.split()
+            # since teams should start at 1 apparently...
+            G.nodes[int(i)]['team'] = int(team) + 1
+        return G
 
 def parse_all_networkx_inputs(path: str, input_path: str):
     for file in os.listdir(path):
         input_from_networkx_file(path, file, input_path)
-
 
 parse_all_networkx_inputs("../networkx_inputs", "inputs")

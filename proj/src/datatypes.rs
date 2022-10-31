@@ -8,6 +8,7 @@ pub struct Graph {
     pub e: i32,
     // i : [(j, w), ...]
     pub edges: HashMap<i32, Vec<(i32, i32)>>,
+    pub original_file_as_string: String,
 }
 
 #[derive(Clone, Debug)]

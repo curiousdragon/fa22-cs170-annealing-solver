@@ -1,4 +1,7 @@
+use itertools::Itertools;
+
 use crate::datatypes::Graph;
+use crate::datatypes::Partition;
 use std::{collections::HashMap, fs};
 
 pub fn run(filepath: &str) -> Graph {
@@ -15,5 +18,20 @@ pub fn run(filepath: &str) -> Graph {
         edges.entry(i).or_default().push((j, w));
         edges.entry(j).or_default().push((i, w));
     }
-    Graph { n, e, edges }
+    Graph {
+        n,
+        e,
+        edges,
+        original_file_as_string: f,
+    }
+}
+
+pub fn write_output(filepath: &str, g: &Graph, p: &Partition) {
+    let contents = g.original_file_as_string.to_string()
+        + &p.partitions
+            .iter()
+            .enumerate()
+            .map(|(i, part)| format!("{i} {part}"))
+            .join("\n");
+    fs::write(filepath, contents);
 }
