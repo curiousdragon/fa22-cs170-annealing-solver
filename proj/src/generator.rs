@@ -16,11 +16,11 @@ const NUM_SAMPLES: usize = 10;
 pub fn run() {
     // s; n=100, 15<=E<=25
     // m; n=250, 45<=E<=55
-    // l; n=1000, 195<=E<=10000
+    // l; n=1000, 195<=E<=5000
 
     generate_and_write(N_SMALL, 15, 25, 0);
     generate_and_write(N_MEDIUM, 45, 55, NUM_SAMPLES);
-    generate_and_write(N_LARGE, 195, 10000, NUM_SAMPLES * 2);
+    generate_and_write(N_LARGE, 195, 5000, NUM_SAMPLES * 2);
 }
 
 fn generate_and_write(n: usize, uniform_low: usize, uniform_high: usize, start_index: usize) {
