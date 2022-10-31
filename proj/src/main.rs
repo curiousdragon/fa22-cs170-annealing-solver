@@ -43,7 +43,7 @@ fn run_solver_on_all_inputs(iterations: usize) {
 }
 
 fn main() {
-    let iterations = 200000; // 10000;
+    let iterations = 500000; // 200000; // 10000;
 
     println!("Choose operating mode:");
     println!("[G] Generate, [D] Default solve (10000), [#] Solve with # iterations");

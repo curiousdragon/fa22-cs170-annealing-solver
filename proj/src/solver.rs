@@ -97,7 +97,7 @@ pub fn run(g: &Graph, iterations: usize, rng: &mut impl Rng) -> Partition {
     //     }
     // }
     // simulated_annealing(g, iterations, rng, left)
-    let low = 2;
+    let low = 1;
     let high = 10;
     let mut best_partition = init(g, 1);
     let mut best_cost = f64::MAX;
