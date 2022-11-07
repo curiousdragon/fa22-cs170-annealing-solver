@@ -13,16 +13,20 @@ pub struct Graph {
 
 #[derive(Clone, Debug)]
 pub struct Partition {
-    // max pi(v)
-    // pub k: i32,
     // v : pi(v)
     pub partitions: Vec<i32>,
+    // total number of partitions represented by
+    // (max pi(v)) + 1
+    // since partitions are zero-indexed
 }
 
 #[derive(Clone, Debug)]
 pub struct Loss {
+    // components of the loss
     pub weight_loss: f64,
     pub num_partition_loss: f64,
     pub partition_size_loss: f64,
+
+    // total loss = weight_loss + num_partition_loss + partition_size_loss
     pub loss: f64,
 }

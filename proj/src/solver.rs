@@ -9,7 +9,6 @@ use tqdm::tqdm;
 
 pub fn init(g: &Graph, num_partitions: i32) -> Partition {
     Partition {
-        // k: num_partitions,
         partitions: (0..g.n).map(|i| i % num_partitions).collect_vec(),
     }
 }
@@ -70,36 +69,18 @@ pub fn simulated_annealing(
         if prob <= accept_prob {
             prev_p = proposed_p;
         }
-        // if i % 1000 == 0 {
-        //     println!("{}", loss(g, &prev_p));
-        // }
     }
-    // println!("{}", loss(g, &prev_p));
     prev_p
 }
 
 pub fn run(g: &Graph, iterations: usize, rng: &mut impl Rng) -> (Partition, Loss) {
-    // // let mut left = 0;
-    // let mut left = 2;
-    // // let mut right = g.n;
-    // let mut right = 10;
-    // while (right - left).abs() > 2 {
-    //     let left_third = left + (right - left) / 3;
-    //     let right_third = right - (right - left) / 3;
-
-    //     let left_partition = simulated_annealing(g, iterations, rng, left_third);
-    //     let right_partition = simulated_annealing(g, iterations, rng, right_third);
-    //     if loss(g, &left_partition) < loss(g, &right_partition) {
-    //         left = left_third;
-    //     } else {
-    //         right = right_third;
-    //     }
-    // }
-    // simulated_annealing(g, iterations, rng, left)
-    let low = 2;
-    let high = 20;
+    // initialize with all nodes in the same partition
     let mut best_partition = init(g, 1);
     let mut best_cost = loss(g, &best_partition);
+
+    // iteration through other possible numbers of partitions
+    let low = 2;
+    let high = 20;
     for k in tqdm(low..high) {
         let p = simulated_annealing(g, iterations, rng, k);
         let cost = loss(g, &p);
