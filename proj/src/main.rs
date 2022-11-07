@@ -14,10 +14,12 @@ fn run_solver_on_input(iterations: usize, input_name: &str) {
     let mut rng = thread_rng();
     let filepath = format!("inputs/{input_name}");
     let g = parser::run(&filepath);
-    let p = solver::run(&g, iterations, &mut rng);
+    let (p, cost) = solver::run(&g, iterations, &mut rng);
     parser::write_output(&format!("outputs/{input_name}-output"), &g, &p);
-    let cost = scorer::loss(&g, &p);
-    println!("{filepath}: {cost}");
+    println!(
+        "{filepath}: {0}: {1} + {2} + {3}",
+        cost.loss, cost.weight_loss, cost.num_partition_loss, cost.partition_size_loss
+    );
     println!();
     println!("Running simulated annealing solver complete!");
 }
@@ -34,10 +36,23 @@ fn run_solver_on_all_inputs(iterations: usize) {
         let filename = os_filename.to_str().expect("Invalid input filename");
         let filepath = os_path.to_str().expect("Invalid input filepath");
         let g = parser::run(filepath);
-        let p = solver::run(&g, iterations, &mut rng);
+        let (p, cost) = solver::run(&g, iterations, &mut rng);
         parser::write_output(&format!("outputs/{filename}-output"), &g, &p);
-        let cost = scorer::loss(&g, &p);
-        println!("{filepath}: {cost}");
+        println!(
+            "{filepath}: {0}: {1} + {2} + {3}",
+            cost.loss, cost.weight_loss, cost.num_partition_loss, cost.partition_size_loss
+        );
+        let _ = fs::write(
+            &format!("scores/{filename}-score"),
+            &format!(
+                "{filepath}, {4}: {0}: {1} + {2} + {3}\n",
+                cost.loss,
+                cost.weight_loss,
+                cost.num_partition_loss,
+                cost.partition_size_loss,
+                p.partitions.iter().max().unwrap() + 1
+            ),
+        );
     });
     println!("Running simulated annealing solver complete!");
 }
@@ -46,14 +61,13 @@ fn main() {
     let iterations = 500000; // 200000; // 10000;
 
     println!("Choose operating mode:");
-    println!("[G] Generate, [D] Default solve (10000), [#] Solve with # iterations");
+    println!("[G] Generate, [A] Solve all ({iterations}), [<input>] Solve <input> ({iterations})");
 
     let mut input = String::new();
     io::stdin().read_line(&mut input).unwrap_or_default();
     match input.trim() {
         "G" => generator::run(),
-        "D" => run_solver_on_all_inputs(iterations),
-        // x => run_solver_on_inputs(x.parse().expect("Not an int")),
-        x => run_solver_on_input(500000, x),
+        "A" => run_solver_on_all_inputs(iterations),
+        input_name => run_solver_on_input(iterations, input_name),
     }
 }

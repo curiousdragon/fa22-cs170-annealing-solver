@@ -14,7 +14,15 @@ pub struct Graph {
 #[derive(Clone, Debug)]
 pub struct Partition {
     // max pi(v)
-    pub k: i32,
+    // pub k: i32,
     // v : pi(v)
     pub partitions: Vec<i32>,
+}
+
+#[derive(Clone, Debug)]
+pub struct Loss {
+    pub weight_loss: f64,
+    pub num_partition_loss: f64,
+    pub partition_size_loss: f64,
+    pub loss: f64,
 }

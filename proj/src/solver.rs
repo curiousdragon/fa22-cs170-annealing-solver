@@ -1,13 +1,15 @@
 use crate::datatypes::Graph;
+use crate::datatypes::Loss;
 use crate::datatypes::Partition;
 use crate::scorer::loss;
 use itertools::Itertools;
 use rand::distributions::{Distribution, Uniform};
 use rand::Rng;
+use tqdm::tqdm;
 
 pub fn init(g: &Graph, num_partitions: i32) -> Partition {
     Partition {
-        k: num_partitions,
+        // k: num_partitions,
         partitions: (0..g.n).map(|i| i % num_partitions).collect_vec(),
     }
 }
@@ -15,16 +17,18 @@ pub fn init(g: &Graph, num_partitions: i32) -> Partition {
 fn propose(g: &Graph, prev_p: &Partition, rng: &mut impl Rng) -> Partition {
     let nodes = Uniform::from(0..(g.n as usize));
     let mut proposed_p = prev_p.clone();
+    let prev_part = &prev_p.partitions;
 
     let swap = rng.gen_bool(0.75);
     if swap {
         let i = nodes.sample(rng);
         let j = nodes.sample(rng);
-        proposed_p.partitions[i] = prev_p.partitions[j];
-        proposed_p.partitions[j] = prev_p.partitions[i];
+        proposed_p.partitions[i] = prev_part[j];
+        proposed_p.partitions[j] = prev_part[i];
     } else {
         let i = nodes.sample(rng);
-        let parts = Uniform::from(0..prev_p.k);
+        let max_part = *prev_part.iter().max().unwrap() + 1;
+        let parts = Uniform::from(0..max_part);
         proposed_p.partitions[i] = parts.sample(rng);
     }
 
@@ -44,10 +48,10 @@ fn temperature(r: &f64) -> f64 {
 fn acceptance(g: &Graph, prev_p: &Partition, proposed_p: &Partition, temp: &f64) -> f64 {
     let prev_loss = loss(g, prev_p);
     let proposed_loss = loss(g, proposed_p);
-    if proposed_loss < prev_loss {
+    if proposed_loss.loss < prev_loss.loss {
         1_f64
     } else {
-        f64::exp(-(proposed_loss - prev_loss) / temp)
+        f64::exp(-(proposed_loss.loss - prev_loss.loss) / temp)
     }
 }
 
@@ -74,7 +78,7 @@ pub fn simulated_annealing(
     prev_p
 }
 
-pub fn run(g: &Graph, iterations: usize, rng: &mut impl Rng) -> Partition {
+pub fn run(g: &Graph, iterations: usize, rng: &mut impl Rng) -> (Partition, Loss) {
     // // let mut left = 0;
     // let mut left = 2;
     // // let mut right = g.n;
@@ -92,17 +96,17 @@ pub fn run(g: &Graph, iterations: usize, rng: &mut impl Rng) -> Partition {
     //     }
     // }
     // simulated_annealing(g, iterations, rng, left)
-    let low = 1;
+    let low = 2;
     let high = 20;
     let mut best_partition = init(g, 1);
-    let mut best_cost = f64::MAX;
-    for k in low..high {
+    let mut best_cost = loss(g, &best_partition);
+    for k in tqdm(low..high) {
         let p = simulated_annealing(g, iterations, rng, k);
         let cost = loss(g, &p);
-        if cost < best_cost {
+        if cost.loss < best_cost.loss {
             best_cost = cost;
             best_partition = p;
         }
     }
-    best_partition
+    (best_partition, best_cost)
 }

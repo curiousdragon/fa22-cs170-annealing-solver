@@ -57,4 +57,4 @@ def parse_all_networkx_inputs(path: str, input_path: str):
     for file in os.listdir(path):
         input_from_networkx_file(path, file, input_path)
 
-parse_all_networkx_inputs("../networkx_inputs", "inputs")
+parse_all_networkx_inputs("../latest-inputs", "inputs")
