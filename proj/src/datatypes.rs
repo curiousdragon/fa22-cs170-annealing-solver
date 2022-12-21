@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -14,10 +15,14 @@ pub struct Graph {
 #[derive(Clone, Debug)]
 pub struct Partition {
     // v : pi(v)
+    // note: pi is 0 indexed
     pub partitions: Vec<i32>,
     // total number of partitions represented by
-    // (max pi(v)) + 1
-    // since partitions are zero-indexed
+    // the number of unique pi(v) values
+}
+
+pub fn uniq_partitions(part: &Partition) -> usize {
+    part.partitions.iter().unique().count()
 }
 
 #[derive(Clone, Debug)]
