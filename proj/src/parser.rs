@@ -1,7 +1,6 @@
-use itertools::Itertools;
-
 use crate::datatypes::Graph;
 use crate::datatypes::Partition;
+use itertools::Itertools;
 use std::{collections::HashMap, fs};
 
 pub fn run(filepath: &str) -> Graph {

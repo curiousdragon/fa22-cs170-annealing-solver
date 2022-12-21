@@ -1,11 +1,11 @@
-use std::collections::HashMap;
-
+use crate::datatypes::uniq_partitions;
 use crate::datatypes::Graph;
 use crate::datatypes::Loss;
 use crate::datatypes::Partition;
+use std::collections::HashMap;
 
-pub fn loss(g: &Graph, parts: &Partition) -> Loss {
-    let partitions = &parts.partitions;
+pub fn loss(g: &Graph, p: &Partition) -> Loss {
+    let partitions = &p.partitions;
 
     let weight_loss = (0..partitions.len())
         .map(|i| match g.edges.get(&(i as i32)) {
@@ -24,7 +24,7 @@ pub fn loss(g: &Graph, parts: &Partition) -> Loss {
         .sum::<f64>()
         / 2_f64;
 
-    let k = (*partitions.iter().max().unwrap() + 1) as f64;
+    let k = uniq_partitions(p) as f64;
     let num_partition_loss = 100_f64 * f64::exp(0.5_f64 * k);
 
     let mut partition_sizes = HashMap::<i32, i32>::new();

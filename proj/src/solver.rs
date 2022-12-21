@@ -1,3 +1,4 @@
+use crate::datatypes::uniq_partitions;
 use crate::datatypes::Graph;
 use crate::datatypes::Loss;
 use crate::datatypes::Partition;
@@ -26,7 +27,7 @@ fn propose(g: &Graph, prev_p: &Partition, rng: &mut impl Rng) -> Partition {
         proposed_p.partitions[j] = prev_part[i];
     } else {
         let i = nodes.sample(rng);
-        let max_part = *prev_part.iter().max().unwrap() + 1;
+        let max_part = uniq_partitions(prev_p) as i32;
         let parts = Uniform::from(0..max_part);
         proposed_p.partitions[i] = parts.sample(rng);
     }
@@ -35,13 +36,8 @@ fn propose(g: &Graph, prev_p: &Partition, rng: &mut impl Rng) -> Partition {
 }
 
 fn temperature(r: &f64) -> f64 {
-    // let lambda = 0.5_f64;
-    // f64::exp(-r / lambda)
-
     let beta = 0.5;
     r / (1_f64 + beta * r)
-
-    // *r
 }
 
 fn acceptance(g: &Graph, prev_p: &Partition, proposed_p: &Partition, temp: &f64) -> f64 {
@@ -80,7 +76,7 @@ pub fn run(g: &Graph, iterations: usize, rng: &mut impl Rng) -> (Partition, Loss
 
     // iteration through other possible numbers of partitions
     let low = 2;
-    let high = 20;
+    let high = 15;
     for k in tqdm(low..high) {
         let p = simulated_annealing(g, iterations, rng, k);
         let cost = loss(g, &p);
